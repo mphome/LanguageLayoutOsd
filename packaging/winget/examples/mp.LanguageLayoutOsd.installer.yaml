@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.12.0.schema.json
+PackageIdentifier: mphome.LanguageLayoutOsd
+PackageVersion: 1.0.0
+InstallerType: zip
+NestedInstallerType: portable
+Installers:
+  - Architecture: x64
+    InstallerUrl: https://github.com/mphome/LanguageLayoutOsd/releases/download/v1.0.0/LanguageLayoutOsd-1.0.0-win-x64.zip
+    InstallerSha256: <SHA256_HEX>
+    NestedInstallerFiles:
+      - RelativeFilePath: LanguageLayoutOsd.exe
+        PortableCommandAlias: language-layout-osd
+ManifestType: installer
+ManifestVersion: 1.12.0

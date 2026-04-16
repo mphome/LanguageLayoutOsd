@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.12.0.schema.json
+PackageIdentifier: mp.LanguageLayoutOsd
+PackageVersion: 1.0.0
+PackageLocale: en-US
+Publisher: mp
+PublisherUrl: https://github.com/<owner>
+PackageName: Language Layout OSD
+PackageUrl: https://github.com/<owner>/<repo>
+License: MIT
+LicenseUrl: https://github.com/<owner>/<repo>/blob/main/LICENSE
+ShortDescription: Shows an on-screen indicator when keyboard layout changes.
+ManifestType: defaultLocale
+ManifestVersion: 1.12.0
