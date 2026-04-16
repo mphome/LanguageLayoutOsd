@@ -1,0 +1,22 @@
+# Build outputs
+bin/
+obj/
+
+# User-specific
+*.user
+*.suo
+*.userprefs
+
+# Logs
+*.log
+
+# IDE
+.vs/
+.vscode/
+
+# OS files
+Thumbs.db
+Desktop.ini
+
+# Generated winget manifests
+packaging/winget/out/

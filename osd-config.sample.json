@@ -1,0 +1,23 @@
+{
+  "displayDurationMs": 500,
+  "fontSizePt": 42,
+  "pollingIntervalMs": 150,
+  "defaultBackColor": "#A0282828",
+  "defaultTextColor": "#F5F5F5",
+  "ruBackColor": "#B4782814",
+  "ruTextColor": "#FFFFFF",
+  "languageStyles": {
+    "EN": {
+      "backColor": "#A0282828",
+      "textColor": "#F5F5F5"
+    },
+    "RU": {
+      "backColor": "#B4782814",
+      "textColor": "#FFFFFF"
+    },
+    "UK": {
+      "backColor": "#B41F4E9A",
+      "textColor": "#FFFFFF"
+    }
+  }
+}
