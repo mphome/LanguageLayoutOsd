@@ -22,6 +22,17 @@ namespace LanguageLayoutOsd
             DiagnosticLog.Write("TrayApplicationContext ctor started.");
 
             _trayMenu = new ContextMenuStrip();
+
+            var startWithWindowsItem = new ToolStripMenuItem("Start with Windows")
+            {
+                CheckOnClick = true,
+                Checked = IsStartWithWindowsEnabled()
+            };
+            startWithWindowsItem.Click += StartWithWindowsItem_Click;
+            _trayMenu.Items.Add(startWithWindowsItem);
+
+            _trayMenu.Items.Add(new ToolStripSeparator());
+
             var aboutItem = new ToolStripMenuItem("About");
             aboutItem.Click += AboutItem_Click;
             _trayMenu.Items.Add(aboutItem);
@@ -154,6 +165,75 @@ namespace LanguageLayoutOsd
             }
 
             return SystemIcons.Application;
+        }
+
+        private const string StartupRegistryKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
+        private const string StartupAppName = "LanguageLayoutOsd";
+
+        private static bool IsStartWithWindowsEnabled()
+        {
+            try
+            {
+                using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(StartupRegistryKey, false))
+                {
+                    if (key == null) return false;
+                    var value = key.GetValue(StartupAppName) as string;
+                    if (string.IsNullOrEmpty(value)) return false;
+
+                    var currentPath = Assembly.GetExecutingAssembly().Location;
+                    return string.Equals(value, $"\"{currentPath}\"", StringComparison.OrdinalIgnoreCase) ||
+                           string.Equals(value, currentPath, StringComparison.OrdinalIgnoreCase);
+                }
+            }
+            catch (Exception ex)
+            {
+                DiagnosticLog.WriteException("IsStartWithWindowsEnabled check failed", ex);
+                return false;
+            }
+        }
+
+        private static void SetStartWithWindows(bool enable)
+        {
+            try
+            {
+                using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(StartupRegistryKey, true))
+                {
+                    if (key == null)
+                    {
+                        DiagnosticLog.Write("Startup registry key not found.");
+                        return;
+                    }
+
+                    if (enable)
+                    {
+                        var currentPath = Assembly.GetExecutingAssembly().Location;
+                        key.SetValue(StartupAppName, $"\"{currentPath}\"");
+                        DiagnosticLog.Write("Added to startup: " + currentPath);
+                    }
+                    else
+                    {
+                        key.DeleteValue(StartupAppName, false);
+                        DiagnosticLog.Write("Removed from startup.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                DiagnosticLog.WriteException("SetStartWithWindows failed", ex);
+                MessageBox.Show(
+                    "Failed to modify startup settings:\n" + ex.Message,
+                    "Language Layout OSD",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+        }
+
+        private void StartWithWindowsItem_Click(object sender, EventArgs e)
+        {
+            if (sender is ToolStripMenuItem item)
+            {
+                SetStartWithWindows(item.Checked);
+            }
         }
     }
 }

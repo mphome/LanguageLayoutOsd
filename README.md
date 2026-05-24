@@ -9,8 +9,9 @@ Lightweight Windows tray utility that shows an on-screen indicator (`EN`, `RU`, 
 - OSD appears in center of primary screen.
 - Borderless, topmost, no taskbar, no Alt+Tab, no focus stealing.
 - Single OSD instance: timer restarts on rapid changes, no stacked popups.
-- Tray icon with `Exit` menu.
+- Tray icon with `Start with Windows` checkbox and diagnostics/exit actions.
 - Optional JSON config.
+- Windows Startup integration (Runs on startup via user registry entry).
 - Diagnostic logging for runtime issues.
 
 ## Tech Stack
@@ -41,6 +42,16 @@ dotnet build LanguageLayoutOsd.csproj -c Release
 Output executable:
 
 - `bin\Release\net45\LanguageLayoutOsd.exe`
+
+### Build Installer
+
+An automated PowerShell script builds the project in Release mode and compiles a professional, non-admin-required Inno Setup installer package `LanguageLayoutOsd-Setup.exe` into the `dist\` folder:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\packaging\installer\build-installer.ps1
+```
+
+*(Note: If Inno Setup is not installed, the script will suggest installing it via `winget install JRSoftware.InnoSetup`)*
 
 ## Configuration
 

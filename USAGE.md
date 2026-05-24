@@ -18,7 +18,12 @@ After startup, the app runs in the system tray and tracks layout changes in back
 
 ## Tray Menu
 
-- Right-click tray icon -> `Exit` to stop the app.
+Right-click the tray icon to see the options:
+
+- **Start with Windows**: Toggle checkbox to register/unregister the utility for Windows Startup (no admin rights/UAC required, stores configuration in current user registry space).
+- **About**: Displays application name, version, and description.
+- **Log Folder**: Opens the Windows Explorer to the diagnostic log directory where `diagnostic.log` is stored.
+- **Exit**: Exits and stops the application.
 
 ## Config File
 
