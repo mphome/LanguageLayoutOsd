@@ -201,7 +201,9 @@ Future features:
 * No installer
 * No system-level hooks
 * No registry modification
-* No cursor manipulation
+* No caret mode detection (`_` / `|`)
+* Global language-colored `IBeam` cursor is supported
+* Best-effort language overlay near the mouse over text is supported
 
 ---
 

@@ -11,14 +11,18 @@ namespace LanguageLayoutOsd
     {
         private readonly LayoutMonitor _monitor;
         private readonly OsdForm _osdForm;
+        private readonly MouseOverlayForm _mouseOverlayForm;
+        private readonly CursorIndicator _cursorIndicator;
         private readonly NotifyIcon _notifyIcon;
         private readonly ContextMenuStrip _trayMenu;
         private bool _disposed;
 
-        public TrayApplicationContext(LayoutMonitor monitor, OsdForm osdForm)
+        public TrayApplicationContext(LayoutMonitor monitor, OsdForm osdForm, MouseOverlayForm mouseOverlayForm, CursorIndicator cursorIndicator)
         {
             _monitor = monitor;
             _osdForm = osdForm;
+            _mouseOverlayForm = mouseOverlayForm;
+            _cursorIndicator = cursorIndicator;
             DiagnosticLog.Write("TrayApplicationContext ctor started.");
 
             _trayMenu = new ContextMenuStrip();
@@ -58,8 +62,11 @@ namespace LanguageLayoutOsd
             // Force form handle creation on UI thread, so background callbacks can safely BeginInvoke.
             IntPtr handle = _osdForm.Handle;
             DiagnosticLog.Write("OSD form handle created: " + handle);
+            IntPtr mouseOverlayHandle = _mouseOverlayForm.Handle;
+            DiagnosticLog.Write("Mouse overlay handle created: " + mouseOverlayHandle);
 
             _monitor.LayoutChanged += Monitor_LayoutChanged;
+            _monitor.MouseChanged += Monitor_MouseChanged;
             _monitor.Start();
             DiagnosticLog.Write("Layout monitor started.");
         }
@@ -69,12 +76,18 @@ namespace LanguageLayoutOsd
             try
             {
                 DiagnosticLog.Write("Layout changed: " + layoutCode);
+                _cursorIndicator.Apply(layoutCode);
                 _osdForm.ShowLayout(layoutCode);
             }
             catch (Exception ex)
             {
                 DiagnosticLog.WriteException("Monitor_LayoutChanged failed", ex);
             }
+        }
+
+        private void Monitor_MouseChanged(string layoutCode, Point mousePosition)
+        {
+            _mouseOverlayForm.ShowLayoutAtMouse(layoutCode, mousePosition);
         }
 
         private void ExitItem_Click(object sender, EventArgs e)
@@ -140,7 +153,10 @@ namespace LanguageLayoutOsd
             _disposed = true;
 
             _monitor.LayoutChanged -= Monitor_LayoutChanged;
+            _monitor.MouseChanged -= Monitor_MouseChanged;
             _monitor.Dispose();
+            _cursorIndicator.Dispose();
+            _mouseOverlayForm.Dispose();
             _osdForm.Dispose();
 
             _notifyIcon.Visible = false;
