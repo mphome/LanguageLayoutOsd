@@ -13,6 +13,7 @@ obj/
 # IDE
 .vs/
 .vscode/
+dist/
 
 # OS files
 Thumbs.db
