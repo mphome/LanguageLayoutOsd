@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using System.Threading;
 
 namespace LanguageLayoutOsd
@@ -21,6 +22,7 @@ namespace LanguageLayoutOsd
         }
 
         public event Action<string> LayoutChanged;
+        public event Action<string, Point> MouseChanged;
 
         public void Start()
         {
@@ -42,6 +44,7 @@ namespace LanguageLayoutOsd
             string current = _layoutService.GetCurrentLayoutCode();
             if (string.IsNullOrEmpty(current))
             {
+                RaiseMouseChanged(null, Point.Empty);
                 return;
             }
 
@@ -55,22 +58,43 @@ namespace LanguageLayoutOsd
                 }
             }
 
-            if (!changed)
+            if (changed)
+            {
+                var handler = LayoutChanged;
+                if (handler != null)
+                {
+                    try
+                    {
+                        handler(current);
+                    }
+                    catch (Exception ex)
+                    {
+                        DiagnosticLog.WriteException("LayoutChanged handler failed", ex);
+                    }
+                }
+            }
+
+            Point mousePosition;
+            RaiseMouseChanged(
+                current,
+                _layoutService.TryGetMousePositionOverIBeam(out mousePosition) ? mousePosition : Point.Empty);
+        }
+
+        private void RaiseMouseChanged(string layoutCode, Point position)
+        {
+            var handler = MouseChanged;
+            if (handler == null)
             {
                 return;
             }
 
-            var handler = LayoutChanged;
-            if (handler != null)
+            try
             {
-                try
-                {
-                    handler(current);
-                }
-                catch (Exception ex)
-                {
-                    DiagnosticLog.WriteException("LayoutChanged handler failed", ex);
-                }
+                handler(layoutCode, position);
+            }
+            catch (Exception ex)
+            {
+                DiagnosticLog.WriteException("MouseChanged handler failed", ex);
             }
         }
 

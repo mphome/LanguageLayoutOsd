@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -6,9 +7,21 @@ namespace LanguageLayoutOsd
 {
     internal static class Program
     {
+        private static Mutex _singleInstanceMutex;
+
         [STAThread]
         private static void Main()
         {
+            if (!TryAcquireSingleInstance())
+            {
+                MessageBox.Show(
+                    "LanguageLayoutOsd is already running.",
+                    "LanguageLayoutOsd",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
             string logPath = DiagnosticLog.Initialize();
 
             Application.ThreadException += Application_ThreadException;
@@ -28,8 +41,10 @@ namespace LanguageLayoutOsd
 
                 var layoutService = new LayoutService();
                 var osdForm = new OsdForm(config);
+                var mouseOverlayForm = new MouseOverlayForm(config);
                 var monitor = new LayoutMonitor(layoutService, config.PollingIntervalMs);
-                var appContext = new TrayApplicationContext(monitor, osdForm);
+                var cursorIndicator = new CursorIndicator(config);
+                var appContext = new TrayApplicationContext(monitor, osdForm, mouseOverlayForm, cursorIndicator);
 
                 DiagnosticLog.Write("Starting Application.Run.");
                 Application.Run(appContext);
@@ -65,7 +80,37 @@ namespace LanguageLayoutOsd
 
         private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
+            CursorIndicator.RestoreSystemCursors();
+            if (_singleInstanceMutex != null)
+            {
+                _singleInstanceMutex.Dispose();
+                _singleInstanceMutex = null;
+            }
+
             DiagnosticLog.Write("ProcessExit fired.");
+        }
+
+        private static bool TryAcquireSingleInstance()
+        {
+            try
+            {
+                bool created;
+                _singleInstanceMutex = new Mutex(true, "Local\\LanguageLayoutOsd", out created);
+                if (created)
+                {
+                    return true;
+                }
+
+                _singleInstanceMutex.Dispose();
+                _singleInstanceMutex = null;
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _singleInstanceMutex = null;
+                DiagnosticLog.WriteException("Single-instance check failed", ex);
+                return true;
+            }
         }
     }
 }

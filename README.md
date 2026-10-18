@@ -6,10 +6,13 @@ Lightweight Windows tray utility that shows an on-screen indicator (`EN`, `RU`, 
 
 - Detects layout of the active (foreground) window.
 - Polling-based detection (default `150ms`).
+- Replaces the global system text-selection (`IBeam`) cursor with a language-colored cursor.
+- Shows a best-effort `EN`/`RU` overlay next to the mouse over text.
 - OSD appears in center of primary screen.
 - Borderless, topmost, no taskbar, no Alt+Tab, no focus stealing.
 - Single OSD instance: timer restarts on rapid changes, no stacked popups.
 - Tray icon with `Start with Windows` checkbox and diagnostics/exit actions.
+- Prevents running multiple copies of the application.
 - Optional JSON config.
 - Windows Startup integration (Runs on startup via user registry entry).
 - Diagnostic logging for runtime issues.
@@ -29,6 +32,8 @@ Lightweight Windows tray utility that shows an on-screen indicator (`EN`, `RU`, 
 - `TrayApplicationContext.cs` - tray lifecycle and background runtime
 - `LayoutMonitor.cs` - polling loop and change detection
 - `LayoutService.cs` - Win32 interop and layout mapping
+- `CursorIndicator.cs` - global language-colored `IBeam` cursor
+- `MouseOverlayForm.cs` - click-through mouse overlay
 - `OsdForm.cs` - overlay UI
 - `AppConfig.cs` - config loading and defaults
 - `DiagnosticLog.cs` - runtime diagnostics
